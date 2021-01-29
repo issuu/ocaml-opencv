@@ -578,6 +578,7 @@ if __name__ == '__main__':
     opencv_ml.write('module Vector = Vector')
     opencv_ml.write('module Scalar = Scalar')
     opencv_ml.write('module Mat = Mat')
+    opencv_ml.write('module Mat32 = Mat32')
     opencv_ml.write('module Cvdata = Cvdata')
 
     # TODO: Export local modules through the mli file also
@@ -586,6 +587,7 @@ if __name__ == '__main__':
     opencv_mli.write('module Vector = Vector')
     opencv_mli.write('module Scalar = Scalar')
     opencv_mli.write('module Mat = Mat')
+    opencv_mli.write('module Mat32 = Mat32')
     opencv_mli.write('module Cvdata = Cvdata')
 
     opencv_ml.write(

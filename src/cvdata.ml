@@ -2,6 +2,7 @@ open Ctypes
 open Loader
 type t =
   | Mat of Mat.t
+  | Mat32 of Mat32.t
   | Unknown of unit Ctypes.ptr
 
 let of_mat mat =
@@ -53,12 +54,15 @@ let extract_cvdata_array (data : unit ptr) : t list =
             begin fun acc index ->
               let cmat = __mat_from_inputarray_array data index in
               let cvdata =
-                (* only extract if mat is 8-bit unsigned *)
                 match __mat_depth cmat with
-                  | 0 ->
+                  | 0 -> (* 8-bit unsigned *)
                       let mat = Mat.bigarray_of_cmat cmat in
                       Mat.copy_cmat_bigarray cmat mat;
                       of_mat mat
+                  | 4 -> (* 32-bit signed *)
+                      let mat = Mat32.bigarray_of_cmat cmat in
+                      Mat32.copy_cmat_bigarray cmat mat;
+                      Mat32 mat
                   | _ -> Unknown cmat in
               cvdata :: acc
             end [] (List.init length (fun x -> length - x - 1))
@@ -78,19 +82,22 @@ let __add_vector_mat =
 let pack_cvdata (cvdata : t) : unit ptr =
   match cvdata with
     | Mat mat -> Mat.cmat_of_bigarray mat |> __input_array_of_mat
+    | Mat32 mat -> Mat32.cmat_of_bigarray mat |> __input_array_of_mat
     | Unknown data -> data
 
 let pack_cvdata_post (cvdata : t) (arr : unit ptr) =
   match cvdata with
     | Mat mat ->
-        begin
-          let cmat = __mat_of_inputarray arr in
-          Mat.copy_cmat_bigarray cmat mat
-        end
+        let cmat = __mat_of_inputarray arr in
+        Mat.copy_cmat_bigarray cmat mat
+    | Mat32 mat ->
+        let cmat = __mat_of_inputarray arr in
+        Mat32.copy_cmat_bigarray cmat mat
     | _ -> ()
 
 let pack_cvdata_array_elem = function
   | Mat mat -> Mat.cmat_of_bigarray mat
+  | Mat32 mat -> Mat32.cmat_of_bigarray mat
   | Unknown data -> data
 
 let pack_cvdata_array (cvdata_lst : t list) =

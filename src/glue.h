@@ -1,5 +1,6 @@
 
 #include <stdlib.h>
+#include <stdint.h>
 #include <opencv2/opencv.hpp>
 #include <caml/mlvalues.h>
 #include <caml/bigarray.h>
@@ -9,6 +10,7 @@ extern "C" {
     // Mat functions
 
     cv::Mat *create_mat();
+    cv::Mat *create_mat32();
     void mat_copy(cv::Mat *src, cv::Mat *dst);
 
     typedef struct caml_ba_array bigarray;
@@ -16,8 +18,10 @@ extern "C" {
     int mat_num_dims(cv::Mat *mat);
     int *mat_dims(cv::Mat *mat);
     uchar *mat_data(cv::Mat *mat);
+    int32_t *mat32_data(cv::Mat *mat);
 
     cv::Mat *mat_of_bigarray(int num_dims, int *dims, char *data);
+    cv::Mat *mat32_of_bigarray(int num_dims, int *dims, int32_t *data);
     void copy_mat_bigarray(cv::Mat *mat, value *v);
 
 

@@ -2,6 +2,7 @@ open Ctypes
 
 type t =
   | Mat of Mat.t
+  | Mat32 of Mat32.t
   | Unknown of unit ptr
 
 val of_mat : Mat.t -> t

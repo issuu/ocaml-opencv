@@ -1,6 +1,7 @@
 
 #include "glue.h"
 #include <stdio.h>
+#include <stdint.h>
 
 extern "C" {
     // Mat functions
@@ -16,6 +17,10 @@ extern "C" {
         // Note that the current solution, i.e. initializing mats with
         // two dimensions, works for all images.
         return new cv::Mat(0, 0, CV_8UC3);
+    }
+
+    cv::Mat *create_mat32() {
+        return new cv::Mat(0, 0, CV_32SC3);
     }
 
     void mat_copy(cv::Mat *src, cv::Mat *dst) {
@@ -39,10 +44,21 @@ extern "C" {
         return mat->data;
     }
 
+    int32_t *mat32_data(cv::Mat *mat) {
+        return (int32_t *) mat->data;
+    }
+
     cv::Mat *mat_of_bigarray(int num_dims, int *dims, char *data) {
         int ndims = num_dims - 1;
         int channels = dims[ndims];
         int type = CV_MAKETYPE(CV_8U, channels);
+        return new cv::Mat(ndims, dims, type, data);
+    }
+
+    cv::Mat *mat32_of_bigarray(int num_dims, int *dims, int32_t *data) {
+        int ndims = num_dims - 1;
+        int channels = dims[ndims];
+        int type = CV_MAKETYPE(CV_32S, channels);
         return new cv::Mat(ndims, dims, type, data);
     }
 
