@@ -8,7 +8,8 @@ let __vector_length = foreign "vector_length" (ptr void @-> returning int)
 let __create_vector =
   foreign "create_vector" (ptr void @-> int @-> int @-> returning (ptr void))
 
-let list_of_vector (t : 'a typ) (p : unit ptr) =
+let list_of_vector (t : 'a typ) (p : 'b ptr) =
+  let p = to_voidp p in
   let len = __vector_length p in
   let start = __vector_data p in
   CArray.from_ptr (from_voidp t start) (len / (sizeof t)) |> CArray.to_list

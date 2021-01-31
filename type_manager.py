@@ -257,7 +257,7 @@ class Vector(WrapperType):
         return '({}) list'.format(self.inner.get_ocaml_type())
 
     def ctypes_to_ocaml(self, val):
-        return Conv('list_of_vector ({}) ({}) |> List.map (fun x -> {})'
+        return Conv('Vector.list_of_vector ({}) ({}) |> List.map (fun x -> {})'
                     .format(self.inner.get_ctypes_value(), val,
                             self.inner.ctypes_to_ocaml('x')))
 

@@ -20,7 +20,7 @@ let cmat_of_bigarray (m : t) : cmat =
 
 let __mat_num_dims = foreign "mat_num_dims" (voidp @-> returning int)
 let __mat_dims = foreign "mat_dims" (voidp @-> returning (ptr int))
-let __mat_data = foreign "mat_data32" (voidp @-> returning (ptr int32_t))
+let __mat_data = foreign "mat32_data" (voidp @-> returning (ptr int32_t))
 
 let bigarray_of_cmat (m : cmat) : t =
   let num_dims = __mat_num_dims m in

@@ -14,6 +14,7 @@ src_files = [
     'opencv4/opencv2/core/types.hpp',
     'opencv4/opencv2/core/mat.hpp',
     'opencv4/opencv2/core.hpp',
+    'opencv4/opencv2/imgcodecs.hpp',
     'opencv4/opencv2/imgproc.hpp',
     'opencv4/opencv2/videoio.hpp',
     'opencv4/opencv2/highgui.hpp',
