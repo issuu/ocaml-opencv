@@ -44,16 +44,19 @@ let __mat_type = foreign "mat_type" (voidp @-> returning int)
 let __mat_depth = foreign "mat_depth" (voidp @-> returning int)
 
 let __mat_data = foreign "mat_data" (voidp @-> returning (ptr int))
-let __mat_data_int32 = foreign "mat_int32_data" (voidp @-> returning (ptr int))
+let __mat_int32_data = foreign "mat_int32_data" (voidp @-> returning (ptr int32_t))
 
 let bigarray_of_cmat (m : cmat) : t =
   let num_dims = __mat_num_dims m in
   let dims_arr = __mat_dims m in
   let dims = CArray.from_ptr dims_arr num_dims |> CArray.to_list |> Array.of_list in
   match (__mat_type m, __mat_depth m) with
-  | (0, 1) ->
+  | (16, 0) ->
       let data = __mat_data m in
       CV_8U (bigarray_of_ptr genarray dims Int8_unsigned data)
+  | (12, 4) ->
+      let data = __mat_int32_data m in
+      CV_32S (bigarray_of_ptr genarray dims Int32 data)
   | (t, d) ->
       failwith (Printf.sprintf "Mat.bigarray_of_cmat: type=%d, depth=%d" t d)
 
@@ -61,9 +64,15 @@ let __copy_cmat_bigarray =
   foreign "copy_mat_bigarray" (voidp @-> voidp @-> returning void)
 
 let copy_cmat_bigarray (m1 : cmat) (m2 : t) =
-  let root = Root.create m2 in
-  let res = __copy_cmat_bigarray m1 root
-  in Root.release root; res
+  match m2 with
+  | CV_8U m2 ->
+    let root = Root.create m2 in
+    let res = __copy_cmat_bigarray m1 root in
+    Root.release root; res
+  | CV_32S m2 ->
+    let root = Root.create m2 in
+    let res = __copy_cmat_bigarray m1 root in
+    Root.release root; res
 
 let __create = foreign "create_mat" (void @-> returning voidp)
 let __create_int32 = foreign "create_mat_int32" (void @-> returning voidp)
