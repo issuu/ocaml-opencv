@@ -18,6 +18,8 @@ val create_int32 : unit -> t
     new mat is independent from [src]. *)
 val clone : t -> t
 
+val dims : t -> int array
+
 val cmat_of_bigarray: t -> cmat
 val bigarray_of_cmat: cmat -> t
 val copy_cmat_bigarray: cmat -> t -> unit

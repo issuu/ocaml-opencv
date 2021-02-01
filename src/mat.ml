@@ -133,3 +133,7 @@ let clone mat =
   __copy (cmat_of_bigarray mat) cmat';
   copy_cmat_bigarray cmat' mat';
   mat'
+
+let dims = function
+  | CV_8U m -> Genarray.dims m
+  | CV_32S m -> Genarray.dims m
