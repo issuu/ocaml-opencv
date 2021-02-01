@@ -10,7 +10,7 @@ type cmat = unit ptr
 let voidp = ptr void
 
 let __mat_of_bigarray =
-  foreign "mat32_of_bigarray" (int @-> ptr int @-> ptr int32_t @-> returning voidp)
+  foreign "mat_int32_of_bigarray" (int @-> ptr int @-> ptr int32_t @-> returning voidp)
 
 let cmat_of_bigarray (m : t) : cmat =
   let num_dims = Genarray.num_dims m in
@@ -20,7 +20,7 @@ let cmat_of_bigarray (m : t) : cmat =
 
 let __mat_num_dims = foreign "mat_num_dims" (voidp @-> returning int)
 let __mat_dims = foreign "mat_dims" (voidp @-> returning (ptr int))
-let __mat_data = foreign "mat32_data" (voidp @-> returning (ptr int32_t))
+let __mat_data = foreign "mat_int32_data" (voidp @-> returning (ptr int32_t))
 
 let bigarray_of_cmat (m : cmat) : t =
   let num_dims = __mat_num_dims m in
@@ -37,7 +37,7 @@ let copy_cmat_bigarray (m1 : cmat) (m2 : t) =
   let res = __copy_cmat_bigarray m1 root
   in Root.release root; res
 
-let __create = foreign "create_mat32" (void @-> returning voidp)
+let __create = foreign "create_mat_int32" (void @-> returning voidp)
 let __copy = foreign "mat_copy" (voidp @-> voidp @-> returning void)
 
 let recycling = ref []
