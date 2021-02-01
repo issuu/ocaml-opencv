@@ -1,12 +1,12 @@
 open Ctypes
+open Bigarray
 
 type t =
   | Mat of Mat.t
-  | Mat_int32 of Mat_int32.t
   | Unknown of unit ptr
 
-val of_mat : Mat.t -> t
-val to_mat : t -> Mat.t
+val of_mat : (int, int8_unsigned_elt, c_layout) Genarray.t -> t
+val to_mat : t -> (int, int8_unsigned_elt, c_layout) Genarray.t
 
 val clone : t -> t
 

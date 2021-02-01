@@ -4,30 +4,54 @@ open Ctypes_static
 
 let foreign = Loader.foreign
 
-type t = (int, int8_unsigned_elt, c_layout) Genarray.t
+type t =
+  | CV_8U of (int, int8_unsigned_elt, c_layout) Genarray.t
+  | CV_32S of (int32, int32_elt, c_layout) Genarray.t
 
 type cmat = unit ptr
+
 let voidp = ptr void
+
+let get_8u = function
+  | CV_8U m -> m
+  | CV_32S _ -> failwith "Mat.get_8u"
+
+let get_32s = function
+  | CV_8U _ -> failwith "Mat.get_32s"
+  | CV_32S m -> m
 
 let __mat_of_bigarray =
   foreign "mat_of_bigarray" (int @-> ptr int @-> ptr int @-> returning voidp)
 
-let cmat_of_bigarray (m : t) : cmat =
-  let num_dims = Genarray.num_dims m in
-  let dims = Genarray.dims m |> Array.to_list |> CArray.of_list int |> CArray.start in
-  let data = bigarray_start genarray m in
-  __mat_of_bigarray num_dims dims data
+let __mat_int32_of_bigarray =
+  foreign "mat_int32_of_bigarray" (int @-> ptr int @-> ptr int32_t @-> returning voidp)
+
+let cmat_of_bigarray : t -> cmat = function
+  | CV_8U m ->
+      let num_dims = Genarray.num_dims m in
+      let dims = Genarray.dims m |> Array.to_list |> CArray.of_list int |> CArray.start in
+      let data = bigarray_start genarray m in
+      __mat_of_bigarray num_dims dims data
+  | CV_32S m ->
+      let num_dims = Genarray.num_dims m in
+      let dims = Genarray.dims m |> Array.to_list |> CArray.of_list int |> CArray.start in
+      let data = bigarray_start genarray m in
+      __mat_int32_of_bigarray num_dims dims data
 
 let __mat_num_dims = foreign "mat_num_dims" (voidp @-> returning int)
 let __mat_dims = foreign "mat_dims" (voidp @-> returning (ptr int))
 let __mat_data = foreign "mat_data" (voidp @-> returning (ptr int))
+let __mat_type = foreign "mat_type" (voidp @-> returning int)
+let __mat_depth = foreign "mat_depth" (voidp @-> returning int)
 
 let bigarray_of_cmat (m : cmat) : t =
   let num_dims = __mat_num_dims m in
   let dims_arr = __mat_dims m in
   let dims = CArray.from_ptr dims_arr num_dims |> CArray.to_list |> Array.of_list in
   let data = __mat_data m in
-  bigarray_of_ptr genarray dims Int8_unsigned data
+  match (__mat_type m, __mat_depth m) with
+  | (0, 1) -> CV_8U (bigarray_of_ptr genarray dims Int8_unsigned data)
+  | (t, d) -> failwith (Printf.sprintf "Mat.bigarray_of_cmat: type=%d, depth=%d" t d)
 
 let __copy_cmat_bigarray =
   foreign "copy_mat_bigarray" (voidp @-> voidp @-> returning void)
@@ -38,6 +62,7 @@ let copy_cmat_bigarray (m1 : cmat) (m2 : t) =
   in Root.release root; res
 
 let __create = foreign "create_mat" (void @-> returning voidp)
+let __create_int32 = foreign "create_mat_int32" (void @-> returning voidp)
 let __copy = foreign "mat_copy" (voidp @-> voidp @-> returning void)
 
 let recycling = ref []
@@ -77,6 +102,21 @@ let create () =
     | [] ->
         begin
           let mat = __create () |> bigarray_of_cmat in
+          Gc.finalise finaliser mat;
+          mat
+        end
+    | hd :: tl ->
+        begin
+          recycling := tl;
+          Gc.finalise finaliser hd;
+          hd
+        end
+
+let create_int32 () =
+  match !recycling with
+    | [] ->
+        begin
+          let mat = __create_int32 () |> bigarray_of_cmat in
           Gc.finalise finaliser mat;
           mat
         end

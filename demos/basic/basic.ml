@@ -22,7 +22,7 @@ let () =
     let b = 30 in
     let tiled = O.concatenate ~axis:1 Cvdata.[|to_mat drawn; to_mat threshed|] in
     let padded = O.pad ~v:127 [[b; b]; [b; b]; [0; 0]] tiled in
-    imshow "foobar" (Cvdata.Mat padded);
+    imshow "foobar" (Cvdata.of_mat padded);
     let _ = wait_key () in
     loop ()
   in loop ()

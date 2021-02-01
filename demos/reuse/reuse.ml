@@ -20,7 +20,7 @@ let () =
     let tiled = Owl.Dense.Ndarray.Generic.concatenate ~axis:1
         [|chan |> Cvdata.to_mat; threshed |> Cvdata.to_mat|] in
     let padded = Owl.Dense.Ndarray.Generic.pad ~v:127 [[b; b]; [b; b]; [0; 0]] tiled in
-    imshow "foobar" (Cvdata.Mat padded);
+    imshow "foobar" (Cvdata.of_mat padded);
     let _ = wait_key () in
     loop ()
   in loop ()
