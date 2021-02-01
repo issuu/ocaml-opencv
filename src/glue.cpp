@@ -40,6 +40,10 @@ extern "C" {
         return dim;
     }
 
+    int mat_type(cv::Mat *mat) {
+        return mat->type();
+    }
+
     uchar *mat_data(cv::Mat *mat) {
         return mat->data;
     }

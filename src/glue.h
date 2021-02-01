@@ -17,6 +17,8 @@ extern "C" {
 
     int mat_num_dims(cv::Mat *mat);
     int *mat_dims(cv::Mat *mat);
+    int mat_type(cv::Mat *mat);
+
     uchar *mat_data(cv::Mat *mat);
     int32_t *mat_int32_data(cv::Mat *mat);
 

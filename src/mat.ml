@@ -40,18 +40,22 @@ let cmat_of_bigarray : t -> cmat = function
 
 let __mat_num_dims = foreign "mat_num_dims" (voidp @-> returning int)
 let __mat_dims = foreign "mat_dims" (voidp @-> returning (ptr int))
-let __mat_data = foreign "mat_data" (voidp @-> returning (ptr int))
 let __mat_type = foreign "mat_type" (voidp @-> returning int)
 let __mat_depth = foreign "mat_depth" (voidp @-> returning int)
+
+let __mat_data = foreign "mat_data" (voidp @-> returning (ptr int))
+let __mat_data_int32 = foreign "mat_data_int32" (voidp @-> returning (ptr int))
 
 let bigarray_of_cmat (m : cmat) : t =
   let num_dims = __mat_num_dims m in
   let dims_arr = __mat_dims m in
   let dims = CArray.from_ptr dims_arr num_dims |> CArray.to_list |> Array.of_list in
-  let data = __mat_data m in
   match (__mat_type m, __mat_depth m) with
-  | (0, 1) -> CV_8U (bigarray_of_ptr genarray dims Int8_unsigned data)
-  | (t, d) -> failwith (Printf.sprintf "Mat.bigarray_of_cmat: type=%d, depth=%d" t d)
+  | (0, 1) ->
+      let data = __mat_data m in
+      CV_8U (bigarray_of_ptr genarray dims Int8_unsigned data)
+  | (t, d) ->
+      failwith (Printf.sprintf "Mat.bigarray_of_cmat: type=%d, depth=%d" t d)
 
 let __copy_cmat_bigarray =
   foreign "copy_mat_bigarray" (voidp @-> voidp @-> returning void)
