@@ -44,7 +44,7 @@ let __mat_type = foreign "mat_type" (voidp @-> returning int)
 let __mat_depth = foreign "mat_depth" (voidp @-> returning int)
 
 let __mat_data = foreign "mat_data" (voidp @-> returning (ptr int))
-let __mat_data_int32 = foreign "mat_data_int32" (voidp @-> returning (ptr int))
+let __mat_data_int32 = foreign "mat_int32_data" (voidp @-> returning (ptr int))
 
 let bigarray_of_cmat (m : cmat) : t =
   let num_dims = __mat_num_dims m in
