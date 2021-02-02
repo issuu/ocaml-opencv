@@ -10,6 +10,12 @@ let to_mat = function
   | Mat CV_8U mat -> mat
   | _ -> failwith "to_mat"
 
+let of_mat_int32 m = Mat (Mat.CV_32S m)
+
+let to_mat_int32 = function
+  | Mat CV_32S mat -> mat
+  | _ -> failwith "to_mat_int32"
+
 (* internal functions *)
 
 let __inputarray_kind =
