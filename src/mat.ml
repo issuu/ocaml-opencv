@@ -80,8 +80,13 @@ let __copy = foreign "mat_copy" (voidp @-> voidp @-> returning void)
 
 let recycling = ref []
 
+let recycling_int32 = ref []
+
 let finaliser value =
   recycling := value :: !recycling
+
+let finaliser_int32 value =
+  recycling_int32 := value :: !recycling_int32
 
 let create () =
     (*
@@ -126,17 +131,17 @@ let create () =
         end
 
 let create_int32 () =
-  match !recycling with
+  match !recycling_int32 with
     | [] ->
         begin
           let mat = __create_int32 () |> bigarray_of_cmat in
-          Gc.finalise finaliser mat;
+          Gc.finalise finaliser_int32 mat;
           mat
         end
     | hd :: tl ->
         begin
-          recycling := tl;
-          Gc.finalise finaliser hd;
+          recycling_int32 := tl;
+          Gc.finalise finaliser_int32 hd;
           hd
         end
 
