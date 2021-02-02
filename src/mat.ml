@@ -54,7 +54,7 @@ let bigarray_of_cmat (m : cmat) : t =
   | (16, 0) ->
       let data = __mat_data m in
       CV_8U (bigarray_of_ptr genarray dims Int8_unsigned data)
-  | (12, 4) ->
+  | ((12 | 20), 4) ->
       let data = __mat_int32_data m in
       CV_32S (bigarray_of_ptr genarray dims Int32 data)
   | (t, d) ->
